@@ -10,8 +10,7 @@
 
 <body>
   <header class="app-header">
-    <h1>📋 TaskFlow — {{ user.username }}</h1>
-
+    <h1>📋 TaskFlow — {{ user.username }} <span class="task-count">({{ tasks|length }} total)</span></h1>
     <div>
       <button id="theme-btn" type="button">🌙 Dark mode</button>
 
