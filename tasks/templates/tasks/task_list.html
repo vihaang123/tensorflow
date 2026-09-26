@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>TaskFlow</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'tasks/style.css' %}">
+</head>
+
+<body>
+  <header class="app-header">
+    <h1>📋 TaskFlow — {{ user.username }}</h1>
+
+    <div>
+      <button id="theme-btn" type="button">🌙 Dark mode</button>
+
+      <form method="post" action="{% url 'logout' %}" style="display:contents">
+        {% csrf_token %}
+        <button type="submit" class="btn">Log out</button>
+      </form>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="card">
+      <h2>Add a task</h2>
+
+      <form method="post" class="task-form">
+        {% csrf_token %}
+
+        <input
+          type="text"
+          name="title"
+          placeholder="What needs to be done?"
+          required
+        >
+
+        <select name="priority">
+          <option value="low">Low</option>
+          <option value="medium" selected>Medium</option>
+          <option value="high">High</option>
+        </select>
+
+        <input type="date" name="due_date">
+
+        <button class="btn" type="submit">Add task</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Your tasks</h2>
+
+      {% if tasks %}
+        <div class="task-list">
+
+          {% for task in tasks %}
+            <article class="task {% if task.done %}done{% endif %}">
+
+              <div>
+                <h3>{{ task.title }}</h3>
+
+                <div class="meta">
+                  <span class="badge {{ task.priority }}">
+                    {{ task.get_priority_display }}
+                  </span>
+
+                  {% if task.due_date %}
+                    <span>Due {{ task.due_date }}</span>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="actions">
+                <form method="post" action="{% url 'toggle_task' task.id %}">
+                  {% csrf_token %}
+                  <button class="btn" type="submit">
+                    {% if task.done %}Undo{% else %}Done{% endif %}
+                  </button>
+                </form>
+
+                <form method="post" action="{% url 'delete_task' task.id %}">
+                  {% csrf_token %}
+                  <button class="btn danger" type="submit">Delete</button>
+                </form>
+              </div>
+
+            </article>
+          {% endfor %}
+
+        </div>
+      {% else %}
+        <p class="muted">No tasks yet. Add your first one above.</p>
+      {% endif %}
+
+    </section>
+
+  </main>
+
+  <script>
+    const themeBtn = document.getElementById("theme-btn");
+
+    function applyTheme(theme) {
+      document.documentElement.dataset.theme = theme;
+      themeBtn.textContent =
+        theme === "dark" ? "☀️ Light mode" : "🌙 Dark mode";
+      localStorage.setItem("taskflow.theme", theme);
+    }
+
+    themeBtn.addEventListener("click", () => {
+      const next =
+        document.documentElement.dataset.theme === "dark"
+          ? "light"
+          : "dark";
+
+      applyTheme(next);
+    });
+
+    applyTheme(localStorage.getItem("taskflow.theme") || "light");
+  </script>
+
+</body>
+</html>
