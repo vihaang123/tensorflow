@@ -35,3 +35,8 @@ def delete_task(request, task_id):
     task = get_object_or_404(Task, id=task_id, owner=request.user)
     task.delete()
     return redirect("task_list")
+
+@login_required
+def clear_completed(request):
+    Task.objects.filter(owner=request.user, done=True).delete()
+    return redirect("task_list")

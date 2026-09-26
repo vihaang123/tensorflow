@@ -47,6 +47,13 @@
 
         <button class="btn" type="submit">Add task</button>
       </form>
+
+      <form method="post" action="{% url 'clear_completed' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn" style="background:var(--text-muted)">
+          Clear completed
+        </button>
+      </form>
     </section>
 
     <section class="card">
